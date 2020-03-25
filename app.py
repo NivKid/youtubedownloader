@@ -31,13 +31,29 @@ def transform_view():
     video = pafy.new(url)
     title= video.title
     streams = video.streams
+    audiostreams = video.audiostreams
+    check = 0
     a= '<html><body><h1>'+title+'</h1>'
     for s in streams:
-        a=a+'<p>-----------------------------------------------</p>'
+        if check == 0:
+            a=a+'<p>-------------------VIDEO-----------------------</p>'
+            check =1
+        else:
+            a=a+'<p>-----------------------------------------------</p>'
         a=a+'<p>resolution: '+s.resolution+'</p>'
         a=a+'<p>extension: '+s.extension+'</p>'
         a=a+'<p>filesize: '+str(size(s.get_filesize()))+'</p>'
         a=a+'<p>DownloadLink: <a href="'+s.url+'">click here to download</a></p>'
+    check = 0
+    for aus in audiostreams:
+        if check == 0:
+            a=a+'<p>-------------------AUDIO-----------------------</p>'
+            check = 1
+        else:
+            a=a+'<p>-----------------------------------------------</p>'
+        a=a+'<p>extension: '+aus.extension+'</p>'
+        a=a+'<p>filesize: '+str(size(aus.get_filesize()))+'</p>'
+        a=a+'<p>DownloadLink: <a href="'+aus.url+'">click here to download</a></p>'
     a=a+'</body></html>'    
     return a
 
