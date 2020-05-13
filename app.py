@@ -4,9 +4,19 @@ import os
 import json
 import pafy
 from hurry.filesize import size
+import urllib
+import xmltodict
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+
+def GetAudioStreamFromXML(url):
+  source = urllib.request.urlopen(url)
+  data = source.read()
+  XMLDICT = xmltodict.parse(data)
+  audiostream = XMLDICT['MPD']['Period']['AdaptationSet'][0]['Representation'][1]['BaseURL']
+  return audiostream
+
 
 @app.route('/')
 def form():
@@ -46,6 +56,10 @@ def transform_view():
         a=a+'<p>DownloadLink: <a href="'+s.url+'">click here to download</a></p>'
     check = 0
     for aus in audiostreams:
+        if(aus.url.startswith("https://manifest.googlevideo.com/api/manifest/")):
+            aurl = GetAudioStreamFromXML(aus.url)
+        else:
+          aurl = aus.url     
         if check == 0:
             a=a+'<p>-------------------AUDIO-----------------------</p>'
             check = 1
@@ -53,7 +67,7 @@ def transform_view():
             a=a+'<p>-----------------------------------------------</p>'
         a=a+'<p>extension: '+aus.extension+'</p>'
         a=a+'<p>filesize: '+str(size(aus.get_filesize()))+'</p>'
-        a=a+'<p>DownloadLink: <a href="'+aus.url+'">click here to download</a></p>'
+        a=a+'<p>DownloadLink: <a href="'+aurl+'">click here to download</a></p>'
     a=a+'</body></html>'    
     return a
 
